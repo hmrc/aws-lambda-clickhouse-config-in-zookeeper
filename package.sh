@@ -1,16 +1,21 @@
 #!/bin/bash
 
 set -xeou
-yum install -y zip python36
+yum install -y zip amazon-linux-extras
+amazon-linux-extras enable python3.8
+yum install -y python3.8 python3-pip
+python3.8 -V
+pip3 -V
 
-BASEDIR=/data
-PIPPACKAGESDIR=${BASEDIR}/lambda-packages
+BASE_DIR=/data
+PIP_PACKAGES_DIR=${BASE_DIR}/lambda-packages
 
-cd ${BASEDIR}
+cd ${BASE_DIR}
 
 zip clickhouse_config_in_zookeeper.zip clickhouse_config_in_zookeeper.py
 
-mkdir -p ${PIPPACKAGESDIR}
-pip-3.6 install -t ${PIPPACKAGESDIR} -r requirements.txt
-cd ${PIPPACKAGESDIR}
+mkdir -p ${PIP_PACKAGES_DIR}
+pip3 install --upgrade pip
+pip3 install -t ${PIP_PACKAGES_DIR} -r requirements.txt
+cd ${PIP_PACKAGES_DIR}
 zip -r ../clickhouse_config_in_zookeeper.zip .
