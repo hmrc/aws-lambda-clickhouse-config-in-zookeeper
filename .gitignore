@@ -1,4 +1,9 @@
+# Project specific
+/.coverage
+/build
+*.pyc
 
+# Platform-wide .gitignore rules
 logs
 project/project
 project/target
@@ -28,3 +33,6 @@ lambda-packages/
 venv/
 *.zip
 .vscode/
+.version
+.aws-sam/
+.pytest_cache/
