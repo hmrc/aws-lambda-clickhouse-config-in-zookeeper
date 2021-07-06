@@ -1,19 +1,26 @@
-import logging
 import boto3
-from kazoo.client import KazooClient
 import lxml.etree as et
+import os
+from kazoo.client import KazooClient
+from aws_lambda_powertools import Logger
 
-log = logging.getLogger("clickhouse_config_in_zookeeper")
-log.setLevel(logging.DEBUG)
+logger = Logger(
+    service="aws-lambda-clickhouse-config-in-zookeeper",
+    level=os.environ.get("LOG_LEVEL", "INFO"),
+)
 
 
 def lambda_handler(event, context):
     # Get zookeeper IPs from ec2
     # Get clickhouse-server IPs and shards from ec2
     # Write remote server config to Zookeeper
+    try:
+        logger.info(f"Lambda Request ID: {context.aws_request_id}")
+    except AttributeError:
+        logger.debug(f"No context object available")
 
     ec2 = get_ec2_client()
-    log.debug("get_ec2_client successful")
+    logger.debug("get_ec2_client successful")
 
     zookeeper = get_zookeeper_client(ec2)
 
@@ -22,17 +29,17 @@ def lambda_handler(event, context):
     remote_server_xml, cluster_definition = generate_remote_servers_xml(ec2)
 
     zookeeper.set(remote_server_path, remote_server_xml)
-    log.info("remote_servers added to Zookeeper successfully for cluster definition")
+    logger.info("remote_servers added to Zookeeper successfully for cluster definition")
 
     zookeeper.stop()
-    log.debug("Disconnected from zookeeper.")
+    logger.debug("Disconnected from zookeeper.")
     return {"cluster_definition": cluster_definition}
 
 
 def ensure_path_exists(zookeeper):
     remote_server_path = "clickhouse.config.remote_servers"
     zookeeper.ensure_path(remote_server_path)
-    log.debug(
+    logger.debug(
         "{0} exists: {1}".format(
             remote_server_path, zookeeper.exists(remote_server_path)
         )
@@ -68,11 +75,11 @@ def get_zookeeper_client(ec2_client):
         ]
     )
     ips = [i["PrivateIpAddress"] for i in response["NetworkInterfaces"]]
-    log.debug("Found Zookeeper clients {0}".format(ips))
+    logger.debug("Found Zookeeper clients {0}".format(ips))
     zk = KazooClient(hosts=ips)
-    log.debug("Created Zookeeper kazoo client")
+    logger.debug("Created Zookeeper kazoo client")
     zk.start()
-    log.debug("Connection to zookeeper established.")
+    logger.debug("Connection to zookeeper established.")
     return zk
 
 
@@ -95,7 +102,9 @@ def generate_remote_servers_xml(ec2):
     remote_server_xml = et.tostring(
         remote_servers, encoding="utf8", method="xml", pretty_print=True
     ).rstrip()
-    log.info("Generated remote_servers xml for cluster {0}".format(cluster_definition))
+    logger.info(
+        "Generated remote_servers xml for cluster {0}".format(cluster_definition)
+    )
     return remote_server_xml, cluster_definition
 
 
