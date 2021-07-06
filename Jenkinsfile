@@ -1,32 +1,87 @@
 #!/usr/bin/env groovy
-pipeline {
-  agent any
+node {
+  withCredentials(
+          [[$class: 'UsernamePasswordMultiBinding',
+            credentialsId: 'hmrc-githubcom-service-infra-user-and-pat',
+            usernameVariable: 'GIT_USERNAME',
+            passwordVariable: 'GIT_PERSONAL_ACCESS_TOKEN'
+           ]]
+  ) {
+    stage('git checkout') {
+      step([$class: 'WsCleanup'])
+      final scmVars = checkout(
+              [$class: 'GitSCM',
+               branches: [[name: '*/main']],
+               doGenerateSubmoduleConfigurations: false,
+               extensions: [
+                       [$class: 'CloneOption',
+                        depth: 0,
+                        noTags: false,
+                        reference: '',
+                        shallow: false,
+                        localBranch: '**']],
+               userRemoteConfigs: [
+                       [credentialsId: 'hmrc-githubcom-service-infra-user-and-pat',
+                        url: 'https://github.com/hmrc/aws-lambda-clickhouse-config-in-zookeeper.git']]]
+      )
+      sh('''#!/usr/bin/env bash
+            set -ue
+            echo ${scmVars.GIT_BRANCH} | cut -f 2 -d '/' > .git/_branch''')
+    }
+    stage('Build Poetry Docker Image') {
+      sh("""#!/usr/bin/env bash
+            set -ue
+            ./bin/build-docker-image.sh""")
+    }
+    stage('Prepare Python Environment') {
+      sh("""#!/usr/bin/env bash
+            set -ue
+            ./bin/run-in-docker.sh poetry install""")
+    }
+    stage('Verify (Run tests, lint, check vulnerabilities etc)') {
+      sh("""#!/usr/bin/env bash
+            # Don't set -e as verify will return a non zero exit code in case of vulnerabilities.
+            set -u
+            ./bin/run-in-docker.sh poetry run task verify""")
+    }
+    if (env.BRANCH_NAME == "main") {
+      stage('Determine Artefact Version') {
+        sh('''#!/usr/bin/env bash
+            set -ue
+            GIT_BRANCH="$(cat .git/_branch)" \
+            GITHUB_API_USER="${GIT_USERNAME}" \
+            GITHUB_API_TOKEN="${GIT_PERSONAL_ACCESS_TOKEN}" \
+            ./bin/run-in-docker.sh poetry run task prepare_release''')
+      }
 
-  stages {
-    stage('Prepare') {
-      steps {
-        step([$class: 'WsCleanup'])
-        checkout(scm)
-        sh("""./run-tests.sh""")
+      stage('Build Artefact') {
+        sh('''#!/usr/bin/env bash
+            set -ue
+            SAM_USE_CONTAINER="" \
+            ./bin/run-in-docker.sh poetry run task assemble''')
       }
-    }
-    stage('Build artefact') {
-      steps {
-        sh('./build_local.sh')
+
+      publishStages = ["integration",
+                       "development",
+                       "qa",
+                       "staging",
+                       "externaltest",
+                       "production"].each { environmentName ->
+        stage("Publish Artefact to ${environmentName} S3 Artefact Bucket") {
+          sh("""#!/usr/bin/env bash
+              set -ue
+              GIT_BRANCH="\$(cat .git/_branch)" \
+              GITHUB_API_USER="\${GIT_USERNAME}" \
+              GITHUB_API_TOKEN="\${GIT_PERSONAL_ACCESS_TOKEN}" \
+              MDTP_ENVIRONMENT=${environmentName} \
+              SAM_USE_CONTAINER="" \
+              ./bin/run-in-docker.sh poetry run task publish""")
+        }
       }
-    }
-    stage('Generate sha256') {
-      steps {
-        sh('openssl dgst -sha256 -binary clickhouse_config_in_zookeeper.zip | openssl enc -base64 > clickhouse_config_in_zookeeper.zip.base64sha256')
-      }
-    }
-    stage('Upload to s3') {
-      steps {
-        sh("""for env in sandbox management development qa staging integration externaltest production; do
-                aws s3 cp clickhouse_config_in_zookeeper.zip s3://mdtp-lambda-functions-\${env}/clickhouse_config_in_zookeeper.zip --acl=bucket-owner-full-control
-                aws s3 cp clickhouse_config_in_zookeeper.zip.base64sha256 s3://mdtp-lambda-functions-\${env}/clickhouse_config_in_zookeeper.zip.base64sha256 --content-type text/plain --acl=bucket-owner-full-control
-              done
-          """)
+      stage('Create and push release tag') {
+        sh('''#!/usr/bin/env bash
+            set -ue
+            ./bin/run-in-docker.sh poetry run task cut_release''')
       }
     }
   }

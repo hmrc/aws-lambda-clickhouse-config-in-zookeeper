@@ -33,7 +33,7 @@ coverage = "^5.5"
 
 [tool.taskipy.tasks]
 assemble = "./bin/lambda-tools.sh assemble"
-bandit = "bandit -r ./src"
+bandit = "bandit -r ./src -c .bandit"
 black_check = "black --check --diff ./src ./tests"
 black_reformat = "black ./src ./tests"
 clean = "rm -fr ./build"
