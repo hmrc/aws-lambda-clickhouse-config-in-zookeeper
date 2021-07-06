@@ -4,12 +4,13 @@ from src.clickhouse_config_in_zookeeper import (
     get_ec2_client,
     get_clickhouse_cluster_definition,
 )
-from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
+from aws_lambda_context import LambdaContext
 import unittest
 
 
 class GetZookeeperClient(unittest.TestCase):
-    @patch("clickhouse_config_in_zookeeper.KazooClient")
+    @patch("src.clickhouse_config_in_zookeeper.KazooClient")
     def test_gets_network_interfaces_for_telemetry_zookeeper_and_creates_kazoo_client_with_ips(
         self, mock_kazoo_constructor
     ):
@@ -189,9 +190,9 @@ class GetClickhouseClusterDefinition(unittest.TestCase):
 
 
 class LambdaHandler(unittest.TestCase):
-    @patch("clickhouse_config_in_zookeeper.get_clickhouse_cluster_definition")
-    @patch("clickhouse_config_in_zookeeper.get_zookeeper_client")
-    @patch("clickhouse_config_in_zookeeper.get_ec2_client")
+    @patch("src.clickhouse_config_in_zookeeper.get_clickhouse_cluster_definition")
+    @patch("src.clickhouse_config_in_zookeeper.get_zookeeper_client")
+    @patch("src.clickhouse_config_in_zookeeper.get_ec2_client")
     def test_should_ensure_zookeeper_path_exists_for_remote_servers(
         self,
         mock_get_ec2_client,
@@ -200,17 +201,20 @@ class LambdaHandler(unittest.TestCase):
     ):
         zookeeper = MagicMock()
         mock_get_zookeeper_client.return_value = zookeeper
+        lambda_context = LambdaContext()
+        lambda_context.function_name = "lambda_handler"
+        lambda_context.aws_request_id = "abc-123"
 
-        lambda_handler({}, {})
+        lambda_handler({}, lambda_context)
 
         zookeeper.ensure_path.assert_any_call("clickhouse.config.remote_servers")
 
     @patch(
-        "clickhouse_config_in_zookeeper.get_clickhouse_cluster_definition",
+        "src.clickhouse_config_in_zookeeper.get_clickhouse_cluster_definition",
         return_value="pumpkins",
     )
-    @patch("clickhouse_config_in_zookeeper.get_zookeeper_client")
-    @patch("clickhouse_config_in_zookeeper.get_ec2_client")
+    @patch("src.clickhouse_config_in_zookeeper.get_zookeeper_client")
+    @patch("src.clickhouse_config_in_zookeeper.get_ec2_client")
     def test_all_private_ips_and_shards_matching_clickhouse_server_added_to_zookeeper(
         self,
         mock_get_ec2_client,
@@ -226,8 +230,11 @@ class LambdaHandler(unittest.TestCase):
         mock_get_clickhouse_cluster_definition.return_value = shard_config
         zookeeper = MagicMock()
         mock_get_zookeeper_client.return_value = zookeeper
+        lambda_context = LambdaContext()
+        lambda_context.function_name = "lambda_handler"
+        lambda_context.aws_request_id = "abc-123"
 
-        result = lambda_handler({}, {})
+        result = lambda_handler({}, lambda_context)
 
         remote_servers_xml = b"""<hmrc_data_cluster>
   <shard>
@@ -265,11 +272,8 @@ class LambdaHandler(unittest.TestCase):
 
 
 class GetEC2Client(unittest.TestCase):
-    @patch("clickhouse_config_in_zookeeper.get_ec2_client")
-    @patch("clickhouse_config_in_zookeeper.boto3")
-    def test_check_get_ec2_client_returns_correct_type_of_object(
-        self, mock_boto3, mock_get_ec2_client
-    ):
+    @patch("src.clickhouse_config_in_zookeeper.boto3")
+    def test_check_get_ec2_client_returns_correct_type_of_object(self, mock_boto3):
         expected_response = MagicMock()
         mock_boto3.client.return_value = expected_response
 
