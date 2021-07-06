@@ -55,8 +55,7 @@ safety = "safety check"
 start_lambda = "./bin/start-lambda.sh"
 stop_lambda = "./bin/stop-lambda.sh"
 test = "task unittest"
-# unittest = "PYTHONPATH='src' pytest tests/pytest --cov=src"
-unittest = "nosetests -v --with-cover --cover-erase --cover-package=clickhouse_config_in_zookeeper tests/unit/*.py"
+unittest = "nosetests -v --with-cover --cover-erase --cover-package=src.clickhouse_config_in_zookeeper tests/unit/*.py"
 verify = "task test && task black_check && task safety && task bandit"
 
 [build-system]
