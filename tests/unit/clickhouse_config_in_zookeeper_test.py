@@ -1,4 +1,4 @@
-from src.clickhouse_config_in_zookeeper import (
+from src.handler import (
     lambda_handler,
     get_zookeeper_client,
     get_ec2_client,
@@ -10,7 +10,7 @@ import unittest
 
 
 class GetZookeeperClient(unittest.TestCase):
-    @patch("src.clickhouse_config_in_zookeeper.KazooClient")
+    @patch("src.handler.KazooClient")
     def test_gets_network_interfaces_for_telemetry_zookeeper_and_creates_kazoo_client_with_ips(
         self, mock_kazoo_constructor
     ):
@@ -190,9 +190,9 @@ class GetClickhouseClusterDefinition(unittest.TestCase):
 
 
 class LambdaHandler(unittest.TestCase):
-    @patch("src.clickhouse_config_in_zookeeper.get_clickhouse_cluster_definition")
-    @patch("src.clickhouse_config_in_zookeeper.get_zookeeper_client")
-    @patch("src.clickhouse_config_in_zookeeper.get_ec2_client")
+    @patch("src.handler.get_clickhouse_cluster_definition")
+    @patch("src.handler.get_zookeeper_client")
+    @patch("src.handler.get_ec2_client")
     def test_should_ensure_zookeeper_path_exists_for_remote_servers(
         self,
         mock_get_ec2_client,
@@ -210,11 +210,11 @@ class LambdaHandler(unittest.TestCase):
         zookeeper.ensure_path.assert_any_call("clickhouse.config.remote_servers")
 
     @patch(
-        "src.clickhouse_config_in_zookeeper.get_clickhouse_cluster_definition",
+        "src.handler.get_clickhouse_cluster_definition",
         return_value="pumpkins",
     )
-    @patch("src.clickhouse_config_in_zookeeper.get_zookeeper_client")
-    @patch("src.clickhouse_config_in_zookeeper.get_ec2_client")
+    @patch("src.handler.get_zookeeper_client")
+    @patch("src.handler.get_ec2_client")
     def test_all_private_ips_and_shards_matching_clickhouse_server_added_to_zookeeper(
         self,
         mock_get_ec2_client,
@@ -272,7 +272,7 @@ class LambdaHandler(unittest.TestCase):
 
 
 class GetEC2Client(unittest.TestCase):
-    @patch("src.clickhouse_config_in_zookeeper.boto3")
+    @patch("src.handler.boto3")
     def test_check_get_ec2_client_returns_correct_type_of_object(self, mock_boto3):
         expected_response = MagicMock()
         mock_boto3.client.return_value = expected_response

@@ -8,7 +8,6 @@ PYTHON_REQUIRED := $(shell cat .python-version)
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 POETRY_VIRTUALENVS_IN_PROJECT ?= true
 
-IMAGE_NAME := hmrc/clickhouse_config_in_zookeeper
 TELEMETRY_INTERNAL_BASE_ACCOUNT_ID := 634456480543
 BUCKET_NAME := telemetry-lambda-artifacts-internal-base
 LAMBDA_NAME := clickhouse_config_in_zookeeper

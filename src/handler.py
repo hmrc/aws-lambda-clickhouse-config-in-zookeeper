@@ -20,7 +20,7 @@ def lambda_handler(event, context):
         logger.debug(f"No context object available")
 
     ec2 = get_ec2_client()
-    logger.debug("get_ec2_client successful")
+    logger.debug("The call to get_ec2_client was successful")
 
     zookeeper = get_zookeeper_client(ec2)
 
@@ -29,10 +29,12 @@ def lambda_handler(event, context):
     remote_server_xml, cluster_definition = generate_remote_servers_xml(ec2)
 
     zookeeper.set(remote_server_path, remote_server_xml)
-    logger.info("remote_servers added to Zookeeper successfully for cluster definition")
+    logger.info(
+        "The remote_servers property was added to Zookeeper successfully for cluster definition"
+    )
 
     zookeeper.stop()
-    logger.debug("Disconnected from zookeeper.")
+    logger.debug("Disconnected from zookeeper")
     return {"cluster_definition": cluster_definition}
 
 
@@ -40,7 +42,7 @@ def ensure_path_exists(zookeeper):
     remote_server_path = "clickhouse.config.remote_servers"
     zookeeper.ensure_path(remote_server_path)
     logger.debug(
-        "{0} exists: {1}".format(
+        "The property {0} exists: {1}".format(
             remote_server_path, zookeeper.exists(remote_server_path)
         )
     )
@@ -79,7 +81,7 @@ def get_zookeeper_client(ec2_client):
     zk = KazooClient(hosts=ips)
     logger.debug("Created Zookeeper kazoo client")
     zk.start()
-    logger.debug("Connection to zookeeper established.")
+    logger.debug("Connection to zookeeper established")
     return zk
 
 
