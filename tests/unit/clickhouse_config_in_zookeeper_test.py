@@ -4,7 +4,7 @@ from src.clickhouse_config_in_zookeeper import (
     get_ec2_client,
     get_clickhouse_cluster_definition,
 )
-from unittest.mock import patch, MagicMock
+from mock import patch, MagicMock
 import unittest
 
 
