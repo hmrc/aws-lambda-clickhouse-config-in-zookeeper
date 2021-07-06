@@ -43,7 +43,7 @@ check_python: ## Check Python installation
 .PHONY: check_python
 
 reset: ## Teardown tooling
-	rm $(POETRY_PATH) -r
+	rm -rfv $(POETRY_PATH)
 .PHONY: reset
 
 setup: check_poetry ## Setup virtualenv & dependencies using poetry and set-up the git hook scripts
