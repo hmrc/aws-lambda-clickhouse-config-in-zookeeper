@@ -1,11 +1,11 @@
-from clickhouse_config_in_zookeeper import (
+from src.clickhouse_config_in_zookeeper import (
     lambda_handler,
     get_zookeeper_client,
     get_ec2_client,
     get_clickhouse_cluster_definition,
 )
 from unittest.mock import patch, MagicMock
-import unittest, json, boto3
+import unittest
 
 
 class GetZookeeperClient(unittest.TestCase):
