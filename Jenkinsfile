@@ -11,7 +11,7 @@ node {
       step([$class: 'WsCleanup'])
       final scmVars = checkout(
               [$class: 'GitSCM',
-               branches: [name: "${CHANGE_BRANCH}"],
+               branches: [name: $CHANGE_BRANCH],
                doGenerateSubmoduleConfigurations: false,
                extensions: [
                        [$class: 'CloneOption',
