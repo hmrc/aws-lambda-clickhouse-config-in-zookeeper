@@ -7,28 +7,28 @@ node {
             passwordVariable: 'GIT_PERSONAL_ACCESS_TOKEN'
            ]]
   ) {
-    stage('git checkout') {
-      step([$class: 'WsCleanup'])
-      final scmVars = checkout(
-              [$class: 'GitSCM',
-               branches: [[name: '*/main']],
-               doGenerateSubmoduleConfigurations: false,
-               extensions: [
-                       [$class: 'CloneOption',
-                        depth: 0,
-                        noTags: false,
-                        reference: '',
-                        shallow: false,
-                        localBranch: '**']],
-               userRemoteConfigs: [
-                       [credentialsId: 'hmrc-githubcom-service-infra-user-and-pat',
-                        url: 'https://github.com/hmrc/aws-lambda-clickhouse-config-in-zookeeper.git']]]
-      )
-      sh('''#!/usr/bin/env bash
-            set -ue
-            env
-            echo ${CHANGE_BRANCH} | cut -f 2 -d '/' > .git/_branch''')
-    }
+//    stage('git checkout') {
+//      step([$class: 'WsCleanup'])
+//      final scmVars = checkout(
+//              [$class: 'GitSCM',
+//               branches: [[name: '*/main']],
+//               doGenerateSubmoduleConfigurations: false,
+//               extensions: [
+//                       [$class: 'CloneOption',
+//                        depth: 0,
+//                        noTags: false,
+//                        reference: '',
+//                        shallow: false,
+//                        localBranch: '**']],
+//               userRemoteConfigs: [
+//                       [credentialsId: 'hmrc-githubcom-service-infra-user-and-pat',
+//                        url: 'https://github.com/hmrc/aws-lambda-clickhouse-config-in-zookeeper.git']]]
+//      )
+//      sh('''#!/usr/bin/env bash
+//            set -ue
+//            env
+//            echo ${CHANGE_BRANCH} | cut -f 2 -d '/' > .git/_branch''')
+//    }
     stage('Build Poetry Docker Image') {
       sh("""#!/usr/bin/env bash
             set -ue
