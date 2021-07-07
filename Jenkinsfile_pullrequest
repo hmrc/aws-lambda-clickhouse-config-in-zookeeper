@@ -7,10 +7,10 @@ node {
         passwordVariable: 'GIT_PERSONAL_ACCESS_TOKEN'
       ]]
     ) {
-    stage('git checkout') {
-      step([$class: 'WsCleanup'])
-      branch("TEL-2526")
-    }
+//    stage('git checkout') {
+//      step([$class: 'WsCleanup'])
+//      checkout(scm)
+//    }
     stage('Build Poetry Docker Image') {
       sh("""#!/usr/bin/env bash
             set -ue
