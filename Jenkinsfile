@@ -26,11 +26,14 @@ node {
       )
       sh('''#!/usr/bin/env bash
             set -ue
-            echo ${scmVars.GIT_BRANCH} | cut -f 2 -d '/' > .git/_branch''')
+            env
+            echo ${CHANGE_BRANCH} | cut -f 2 -d '/' > .git/_branch''')
     }
     stage('Build Poetry Docker Image') {
       sh("""#!/usr/bin/env bash
             set -ue
+            pwd
+            ls -la
             ./bin/build-docker-image.sh""")
     }
     stage('Prepare Python Environment') {
