@@ -1,14 +1,9 @@
 
-# clickhouse-config-in-zookeeper-lambda
+# aws-lambda-clickhouse-config-in-zookeeper
 
 [![Brought to you by Telemetry Team](https://img.shields.io/badge/MDTP-Telemetry-40D9C0?style=flat&labelColor=000000&logo=gov.uk)](https://confluence.tools.tax.service.gov.uk/display/TEL/Telemetry)
 
-# aws-lambda-ecs-riemann-reload
-
-[![Brought to you by Telemetry Team](https://img.shields.io/badge/MDTP-Telemetry-40D9C0?style=flat&labelColor=000000&logo=gov.uk)](https://confluence.tools.tax.service.gov.uk/display/TEL/Telemetry)
-
-An AWS Lambda that will re-deploy the Riemann consumer or producer services running in ECS, when triggered by an SNS notification.
-The SNS notification is in turn triggered by an alarm configured to look at when the Kafka agent running in Riemann is (unexpectedly) stopped.
+Zookeeper obtains the configuration for certain Clickhouse configuration files via a lambda which injects the 'remote-servers' config into Zookeeper.
 
 Please check the [telemetry-terraform](https://github.com/hmrc/telemetry-terraform) repository for details on how this Lambda is deployed.
 
