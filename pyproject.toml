@@ -14,10 +14,10 @@ python = "^3.8"
 boto3 = "^1.17.85"
 kazoo = "^2.8.0"
 lxml = "^4.6.3"
+aws-lambda-powertools = "^1.16.1"
 
 [tool.poetry.dev-dependencies]
 aws-lambda-context = "^1.1.0"
-aws-lambda-powertools = "^1.16.1"
 aws-sam-cli = "^1.6.2"
 bandit = "^1.7.0"
 black = "^21.5b2"
