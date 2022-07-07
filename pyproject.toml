@@ -54,7 +54,7 @@ publish_checksum_file = "./bin/lambda-tools.sh publish_checksum_file"
 publish_s3 = "./bin/lambda-tools.sh publish_artifacts_to_s3"
 rename_s3_file = "./bin/lambda-tools.sh rename_artifacts_in_s3"
 # Reason for safely skipping check: https://github.com/aws/aws-sam-cli/issues/3691#issuecomment-1099503361
-safety = "safety check --ignore=47833"
+safety = "safety check --ignore=47833 --ignore=49337"
 start_lambda = "./bin/start-lambda.sh"
 stop_lambda = "./bin/stop-lambda.sh"
 test = "task unittest"
