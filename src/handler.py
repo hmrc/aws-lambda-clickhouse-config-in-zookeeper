@@ -1,8 +1,9 @@
+import os
+
 import boto3
 import lxml.etree as et
-import os
-from kazoo.client import KazooClient
 from aws_lambda_powertools import Logger
+from kazoo.client import KazooClient
 
 logger = Logger(
     service="aws-lambda-clickhouse-config-in-zookeeper",
@@ -17,7 +18,7 @@ def lambda_handler(event, context):
     try:
         logger.info(f"Lambda Request ID: {context.aws_request_id}")
     except AttributeError:
-        logger.debug(f"No context object available")
+        logger.debug("No context object available")
 
     ec2 = get_ec2_client()
     logger.debug("The call to get_ec2_client was successful")
