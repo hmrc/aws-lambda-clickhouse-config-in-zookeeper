@@ -1,12 +1,13 @@
-from src.handler import (
-    lambda_handler,
-    get_zookeeper_client,
-    get_ec2_client,
-    get_clickhouse_cluster_definition,
-)
-from unittest.mock import patch, MagicMock
-from aws_lambda_context import LambdaContext
 import unittest
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
+from aws_lambda_context import LambdaContext
+
+from src.handler import get_clickhouse_cluster_definition
+from src.handler import get_ec2_client
+from src.handler import get_zookeeper_client
+from src.handler import lambda_handler
 
 
 class GetZookeeperClient(unittest.TestCase):
