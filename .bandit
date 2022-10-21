@@ -1,2 +1,5 @@
+<<<<<<< ours
 # See here for details: https://github.com/PyCQA/bandit/issues/716
+=======
+>>>>>>> theirs
 skips: ['B410']

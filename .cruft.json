@@ -1,0 +1,16 @@
+{
+  "template": "https://github.com/hmrc/telemetry-lambda-resources",
+  "commit": "7b3ee78fdb44acf408d544afc8e9d2c134691576",
+  "context": {
+    "cookiecutter": {
+      "bandit_skip_tests": "'B410'",
+      "custom_makefile_name": "",
+      "lambda_artifacts_bucket": "telemetry-internal-base-lambda-artifacts",
+      "lambda_name": "aws-lambda-clickhouse-config-in-zookeeper",
+      "lambda_name_formatted": "aws-lambda-clickhouse-config-in-zookeeper",
+      "_template": "https://github.com/hmrc/telemetry-lambda-resources"
+    }
+  },
+  "directory": null,
+  "checkout": null
+}
