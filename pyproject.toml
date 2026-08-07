@@ -37,7 +37,7 @@ dev = [
 source = ["./src"]
 
 [tool.coverage.report]
-fail_under = 45
+fail_under = 70
 
 [tool.pytest.ini_options]
 log_cli = true
