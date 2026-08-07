@@ -1,6 +1,6 @@
 [project]
 name = "aws-lambda-clickhouse-config-in-zookeeper"
-version = "0.0.0"
+version = "1.0.0"
 description = "An AWS Lambda that will which injects the 'remote-servers' config into Zookeeper"
 authors = [{ name = "Team Telemetry", email = "telemetry@digital.hmrc.gov.uk" }]
 license = "Apache 2.0"
